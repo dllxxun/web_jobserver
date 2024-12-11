@@ -1,0 +1,25 @@
+# 가상환경
+myenv/
+venv/
+env/
+
+# Python 캐시 파일
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code 설정
+.vscode/
+
+# 환경 변수
+.env
+
+# 데이터베이스
+*.db
+*.sqlite3
+
+# 로그 파일
+*.log
+
+# 기타 시스템 파일
+.DS_Store
