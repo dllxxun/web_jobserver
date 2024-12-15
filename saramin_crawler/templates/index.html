@@ -11,24 +11,39 @@
             padding: 0;
             background-color: #f0f8ff;
         }
-        .header {
-            background-color: #0056b3;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 24px;
+        .top-container {
+            border-bottom: 1px solid #e5e5e5;
+            background: white;
+            padding: 20px 0;
         }
-        .search-container {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .logo-search-container {
+            display: flex;
+            align-items: center;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: #0066ff;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-right: 20px;
         }
         .search-box {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
             position: relative;
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
         }
         .search-input {
             width: 100%;
@@ -36,6 +51,10 @@
             border: 2px solid #0056b3;
             border-radius: 25px;
             font-size: 16px;
+        }
+        .search-wrapper {
+            flex: 1;
+            position: relative;
         }
         .job-list {
             max-width: 800px;
@@ -49,10 +68,23 @@
             padding: 15px;
             margin-bottom: 20px;
         }
+        .job-item:hover {
+            border-color: #4876ef;
+        }
+        .job-link {
+            display: block;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+        }
         .job-title {
             font-size: 18px;
             font-weight: bold;
             color: #0056b3;
+        }
+        .company-info {
+            color: #666;
+            font-size: 14px;
         }
         .filter-options {
             display: none;
@@ -91,76 +123,31 @@
     </style>
 </head>
 <body>
-    <div class="header">채용정보 목록</div>
-    <div class="job-list">
-        <div class="search-container">
+    <div class="top-container">
+        <div class="logo-search-container">
+            <a href="/" class="logo">saramin</a>
             <div class="search-box">
-                <input type="text" class="search-input" placeholder="여러분의 꿈을 찾아보세요!" onclick="showFilters()">
-                <div class="filter-options" id="filterOptions">
-                    <div class="filter-category" onclick="showLocationOptions()">지역별</div>
-                    <div class="filter-category">경력별</div>
-                    <div class="filter-category">급여별</div>
-                    <div class="filter-category">기술스택별</div>
-                    <div class="location-options" id="locationOptions">
-                        <div class="location-option" onclick="filterByLocation('서울')">서울</div>
-                        <div class="location-option" onclick="filterByLocation('인천')">인천</div>
-                        <div class="location-option" onclick="filterByLocation('경기')">경기</div>
-                        <div class="location-option" onclick="filterByLocation('부산')">부산</div>
-                        <div class="location-option" onclick="filterByLocation('대구')">대구</div>
-                        <div class="location-option" onclick="filterByLocation('대전')">대전</div>
-                        <div class="location-option" onclick="filterByLocation('광주')">광주</div>
-                        <div class="location-option" onclick="filterByLocation('울산')">울산</div>
-                        <div class="location-option" onclick="filterByLocation('경북')">경북</div>
-                        <div class="location-option" onclick="filterByLocation('세종')">세종</div>
-                    </div>
-                </div>
+                <i class="search-icon">🔍</i>
+                <input type="text" class="search-input" placeholder="당신의 꿈을 찾아보세요!" onclick="showFilters()">
             </div>
         </div>
-        {% for job in jobs %}
-        <div class="job-item">
-            <div class="job-title">{{ job.title }}</div>
-            <div class="company-name">회사: {{ job.company }}</div>
-            <div class="job-location">위치: {{ job.location }}</div>
-        </div>
-        {% endfor %}
     </div>
 
-    <script>
-        function showFilters() {
-            document.getElementById('filterOptions').style.display = 'block';
-        }
-
-        function showLocationOptions() {
-            document.getElementById('locationOptions').style.display = 'block';
-        }
-
-        function filterByLocation(location) {
-            fetch(`/api/jobs?location=${location}`)
-                .then(response => response.json())
-                .then(data => {
-                    // 결과를 화면에 표시하는 로직
-                    updateJobList(data.jobs);
-                });
-        }
-
-        function updateJobList(jobs) {
-            const jobList = document.querySelector('.job-list');
-            jobList.innerHTML = jobs.map(job => `
-                <div class="job-item">
-                    <div class="job-title">${job.title}</div>
-                    <div class="company-name">회사: ${job.company}</div>
-                    <div class="job-location">위치: ${job.location}</div>
-                </div>
-            `).join('');
-        }
-
-        // 검색창 외부 클릭시 필터 숨기기
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.search-box')) {
-                document.getElementById('filterOptions').style.display = 'none';
-                document.getElementById('locationOptions').style.display = 'none';
-            }
-        });
-    </script>
+    <div class="main-content">
+        <div class="job-list">
+            {% for job in jobs %}
+            <div class="job-item">
+                <a href="#" class="job-link">
+                    <div class="job-title">{{ job.title }}</div>
+                    <div class="company-info">
+                        <div class="company-name">회사: {{ job.company }}</div>
+                        <div class="job-location">위치: {{ job.location }}</div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </body>
+
 </html>
