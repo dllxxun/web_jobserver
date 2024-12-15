@@ -23,6 +23,8 @@ class JobPosting(Base):
     company_id = Column(Integer, ForeignKey('companies.id'))
     location = Column(String(100))
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    
     
     # 관계 설정
     company = relationship('Company', back_populates='jobs')
