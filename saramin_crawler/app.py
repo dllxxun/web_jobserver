@@ -27,7 +27,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "Job Server API"
+        'app_name': "OurJobs API Documentation"
     }
 )
 
