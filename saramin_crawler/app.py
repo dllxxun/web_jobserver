@@ -22,7 +22,7 @@ jwt = JWTManager(app)
 
 # Swagger 설정
 SWAGGER_URL = '/api/docs'
-API_URL = '/static/swagger.yaml'
+API_URL = 'http://113.198.66.75:19186/static/swagger.yaml'
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
@@ -94,4 +94,4 @@ def index():
         return f"Crawling error: {str(e)}"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=19186)
