@@ -1,23 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>사람인 채용정보</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채용정보 목록</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+        .header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .job-list {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
         .job-item {
+            background-color: white;
             border: 1px solid #ddd;
-            margin: 10px;
+            border-radius: 5px;
             padding: 15px;
+            margin-bottom: 20px;
+        }
+        .job-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .company-name, .job-location {
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>채용정보 목록</h1>
-    {% for job in jobs %}
-    <div class="job-item">
-        <h2>{{ job.title }}</h2>
-        <p>회사: {{ job.company }}</p>
-        <p>위치: {{ job.location }}</p>
+    <div class="header">채용정보 목록</div>
+    <div class="job-list">
+        {% for job in jobs %}
+        <div class="job-item">
+            <div class="job-title">{{ job.title }}</div>
+            <div class="company-name">회사: {{ job.company }}</div>
+            <div class="job-location">위치: {{ job.location }}</div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </body>
 </html>
