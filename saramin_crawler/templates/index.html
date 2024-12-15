@@ -9,82 +9,43 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f8ff;
+            background-color: #f5f7ff;
         }
-        .top-container {
-            border-bottom: 1px solid #e5e5e5;
-            background: white;
-            padding: 20px 0;
-        }
-
-        .logo-search-container {
-            display: flex;
-            align-items: center;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        .logo {
-            color: #0066ff;
+        .banner {
+            background-color: #0066ff;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
             font-size: 24px;
             font-weight: bold;
-            text-decoration: none;
-            margin-right: 20px;
+        }
+        .search-section {
+            background-color: white;
+            padding: 30px 0;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         .search-box {
             position: relative;
-            flex: 1;
-            max-width: 600px;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
+            width: 100%;
         }
         .search-input {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #0056b3;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #0066ff;
             border-radius: 25px;
             font-size: 16px;
+            outline: none;
         }
-        .search-wrapper {
-            flex: 1;
-            position: relative;
-        }
-        .job-list {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .job-item {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .job-item:hover {
-            border-color: #4876ef;
-        }
-        .job-link {
-            display: block;
-            padding: 20px;
-            text-decoration: none;
-            color: inherit;
-        }
-        .job-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #0056b3;
-        }
-        .company-info {
-            color: #666;
-            font-size: 14px;
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
         .filter-options {
             display: none;
@@ -96,58 +57,144 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 5px;
             z-index: 1000;
         }
         .filter-category {
-            padding: 10px;
+            padding: 12px 20px;
             border-bottom: 1px solid #eee;
             cursor: pointer;
         }
         .filter-category:hover {
-            background-color: #f5f5f5;
+            background-color: #f5f7ff;
         }
         .location-options {
             display: none;
-            padding: 10px;
+            background: white;
+            border-left: 1px solid #eee;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            width: 200px;
         }
-        .location-option {
-            padding: 5px 10px;
+        .title-section {
+            background-color: #0066ff;
+            color: white;
+            padding: 15px 0;
+            margin-top: 20px;
+        }
+        .title-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .job-list {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .job-info {
+            flex-grow: 1;
+        }
+        .job-item {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .location-option:hover {
-            background-color: #e9ecef;
+        .job-item:hover {
+            border-color: #0066ff;
+        }
+        .job-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .company-info {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
         }
         .company-name, .job-location {
-            margin-top: 5px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .apply-button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .apply-button:hover {
+            background-color: #0052cc;
         }
     </style>
 </head>
 <body>
-    <div class="top-container">
-        <div class="logo-search-container">
-            <a href="/" class="logo">saramin</a>
+    <div class="banner">
+        ourjobs
+    </div>
+    
+    <div class="search-section">
+        <div class="search-container">
             <div class="search-box">
-                <i class="search-icon">🔍</i>
+                <span class="search-icon">🔍</span>
                 <input type="text" class="search-input" placeholder="당신의 꿈을 찾아보세요!" onclick="showFilters()">
+                <div class="filter-options" id="filterOptions">
+                    <div class="filter-category" onmouseover="showLocationOptions()">지역별</div>
+                    <div class="filter-category">경력별</div>
+                    <div class="filter-category">급여별</div>
+                    <div class="filter-category">기술스택별</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="job-list">
-            {% for job in jobs %}
-            <div class="job-item">
-                <a href="#" class="job-link">
-                    <div class="job-title">{{ job.title }}</div>
-                    <div class="company-info">
-                        <div class="company-name">회사: {{ job.company }}</div>
-                        <div class="job-location">위치: {{ job.location }}</div>
-                    </div>
-                </a>
-            </div>
-            {% endfor %}
+    <div class="title-section">
+        <div class="title-container">
+            채용정보 목록
         </div>
     </div>
+
+    <div class="job-list">
+        {% for job in jobs %}
+        <div class="job-item">
+            <div class="job-info">
+                <div class="job-title">{{ job.title }}</div>
+                <div class="company-name">회사: {{ job.company }}</div>
+                <div class="job-location">위치: {{ job.location }}</div>
+            </div>
+            <button class="apply-button">지원하기</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function showFilters() {
+            const filterOptions = document.getElementById('filterOptions');
+            filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.addEventListener('click', function(event) {
+            const filterOptions = document.getElementById('filterOptions');
+            if (!event.target.closest('.search-box')) {
+                filterOptions.style.display = 'none';
+            }
+        });
+    </script>
 </body>
-
 </html>
