@@ -19,6 +19,24 @@
             font-weight: bold;
             font-size: 24px;
         }
+        .search-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .search-box {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #0056b3;
+            border-radius: 25px;
+            font-size: 16px;
+        }
         .job-list {
             max-width: 800px;
             margin: 0 auto;
@@ -36,6 +54,37 @@
             font-weight: bold;
             color: #0056b3;
         }
+        .filter-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .filter-category {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .filter-category:hover {
+            background-color: #f5f5f5;
+        }
+        .location-options {
+            display: none;
+            padding: 10px;
+        }
+        .location-option {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .location-option:hover {
+            background-color: #e9ecef;
+        }
         .company-name, .job-location {
             margin-top: 5px;
         }
@@ -44,6 +93,29 @@
 <body>
     <div class="header">채용정보 목록</div>
     <div class="job-list">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="여러분의 꿈을 찾아보세요!" onclick="showFilters()">
+                <div class="filter-options" id="filterOptions">
+                    <div class="filter-category" onclick="showLocationOptions()">지역별</div>
+                    <div class="filter-category">경력별</div>
+                    <div class="filter-category">급여별</div>
+                    <div class="filter-category">기술스택별</div>
+                    <div class="location-options" id="locationOptions">
+                        <div class="location-option" onclick="filterByLocation('서울')">서울</div>
+                        <div class="location-option" onclick="filterByLocation('인천')">인천</div>
+                        <div class="location-option" onclick="filterByLocation('경기')">경기</div>
+                        <div class="location-option" onclick="filterByLocation('부산')">부산</div>
+                        <div class="location-option" onclick="filterByLocation('대구')">대구</div>
+                        <div class="location-option" onclick="filterByLocation('대전')">대전</div>
+                        <div class="location-option" onclick="filterByLocation('광주')">광주</div>
+                        <div class="location-option" onclick="filterByLocation('울산')">울산</div>
+                        <div class="location-option" onclick="filterByLocation('경북')">경북</div>
+                        <div class="location-option" onclick="filterByLocation('세종')">세종</div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% for job in jobs %}
         <div class="job-item">
             <div class="job-title">{{ job.title }}</div>
@@ -52,5 +124,43 @@
         </div>
         {% endfor %}
     </div>
+
+    <script>
+        function showFilters() {
+            document.getElementById('filterOptions').style.display = 'block';
+        }
+
+        function showLocationOptions() {
+            document.getElementById('locationOptions').style.display = 'block';
+        }
+
+        function filterByLocation(location) {
+            fetch(`/api/jobs?location=${location}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 결과를 화면에 표시하는 로직
+                    updateJobList(data.jobs);
+                });
+        }
+
+        function updateJobList(jobs) {
+            const jobList = document.querySelector('.job-list');
+            jobList.innerHTML = jobs.map(job => `
+                <div class="job-item">
+                    <div class="job-title">${job.title}</div>
+                    <div class="company-name">회사: ${job.company}</div>
+                    <div class="job-location">위치: ${job.location}</div>
+                </div>
+            `).join('');
+        }
+
+        // 검색창 외부 클릭시 필터 숨기기
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.search-box')) {
+                document.getElementById('filterOptions').style.display = 'none';
+                document.getElementById('locationOptions').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
