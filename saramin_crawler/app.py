@@ -1,18 +1,42 @@
 from flask import Flask, render_template
+from flask_jwt_extended import JWTManager
+from flask_swagger_ui import get_swaggerui_blueprint
+from datetime import timedelta
 from src.crawler.job_crawler import SaraminCrawler
 from src.database.database import init_db, get_db
 from src.database.models import JobPosting, Company
 from src.api.auth import auth_bp
 from src.api.jobs import jobs_bp
 from src.api.applications import applications_bp
+from src.api.bookmarks import bookmarks_bp
+
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
+# JWT 설정
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+jwt = JWTManager(app)
+
+# Swagger 설정
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/swagger.yaml'
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Job Server API"
+    }
+)
+
 # Blueprint 등록
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(jobs_bp, url_prefix='/api')
 app.register_blueprint(applications_bp, url_prefix='/api')
+app.register_blueprint(bookmarks_bp, url_prefix='/api')
 
 # Database initialization
 with app.app_context():

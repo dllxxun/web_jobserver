@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
+from src.utils.auth import generate_tokens, encode_password
+from src.middleware.auth_middleware import auth_required
 from src.database.models import User
 from src.database.database import get_db
 
@@ -10,13 +11,11 @@ def register():
     data = request.get_json()
     db = next(get_db())
     
-    if db.query(User).filter_by(email=data['email']).first():
-        return jsonify({'error': 'Email already exists'}), 400
-        
+    encoded_password = encode_password(data['password'])
     user = User(
         username=data['username'],
         email=data['email'],
-        password=generate_password_hash(data['password'])
+        password=encoded_password
     )
     db.add(user)
     db.commit()
@@ -29,7 +28,11 @@ def login():
     db = next(get_db())
     
     user = db.query(User).filter_by(email=data['email']).first()
-    if user and check_password_hash(user.password, data['password']):
-        return jsonify({'token': 'your-jwt-token'})
+    if user and encode_password(data['password']) == user.password:
+        access_token, refresh_token = generate_tokens(user.id)
+        return jsonify({
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        })
     
     return jsonify({'error': 'Invalid credentials'}), 401
