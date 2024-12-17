@@ -1,222 +1,161 @@
-from flask import Blueprint, request, jsonify
+from flask import request
+from flask_restx import Resource, Namespace, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.api.models import db, Job
 
-jobs_bp = Blueprint('jobs', __name__)
+jobs_ns = Namespace('jobs', path='/jobs')
 
-@jobs_bp.route('/jobs', methods=['GET'])
-def get_jobs():
-    """채용 공고 목록 조회
-     ---
-    parameters:
-      - name: page
-        in: query
-        type: integer
-        required: false
-        default: 1
-      - name: size
-        in: query
-        type: integer
-        required: false
-        default: 20
-    responses:
-        200:
-            description: 채용 공고 목록
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            status:
-                                type: string
-                            data:
-                                type: array
-                                items:
-                                    type: object
-                                    properties:
-                                        id:
-                                            type: integer
-                                        title:
-                                            type: string
-    """
-    try:
-        page = request.args.get('page', 1, type=int)
-        size = request.args.get('size', 20, type=int)  # 페이지 크기 20으로 설정
-        keyword = request.args.get('keyword')
-        category = request.args.get('category')
-        location = request.args.get('location')
-        salary_min = request.args.get('salary_min', type=int)
-        salary_max = request.args.get('salary_max', type=int)
+# API 모델 정의
+job_model = jobs_ns.model('Job', {
+    'title': fields.String(required=True, description='채용 공고 제목'),
+    'description': fields.String(required=True, description='상세 설명'),
+    'company': fields.String(required=True, description='회사명'),
+    'location': fields.String(required=True, description='근무지'),
+    'salary_range': fields.String(description='급여 범위'),
+    'requirements': fields.List(fields.String, description='요구사항'),
+    'category': fields.String(description='카테고리'),
+    'job_type': fields.String(description='고용 형태')
+})
 
-        # 기본 쿼리 생성
-        query = Job.query
+@jobs_ns.route('/')
+class JobList(Resource):
+    @jobs_ns.doc('채용 공고 목록 조회')
+    @jobs_ns.param('page', '페이지 번호', type=int, default=1)
+    @jobs_ns.param('size', '페이지 크기', type=int, default=20)
+    @jobs_ns.param('keyword', '검색어')
+    @jobs_ns.param('category', '카테고리')
+    @jobs_ns.param('location', '지역')
+    @jobs_ns.param('salary_min', '최소 급여', type=int)
+    @jobs_ns.param('salary_max', '최대 급여', type=int)
+    def get(self):
+        try:
+            page = int(request.args.get('page', 1))
+            size = int(request.args.get('size', 20))
+            keyword = request.args.get('keyword')
+            category = request.args.get('category')
+            location = request.args.get('location')
+            salary_min = request.args.get('salary_min', type=int)
+            salary_max = request.args.get('salary_max', type=int)
 
-        # 필터링 조건 추가
-        if keyword:
-            query = query.filter(Job.title.ilike(f'%{keyword}%'))
-        if category:
-            query = query.filter(Job.category == category)
-        if location:
-            query = query.filter(Job.location.ilike(f'%{location}%'))
-        if salary_min:
-            query = query.filter(Job.salary_range >= salary_min)
-        if salary_max:
-            query = query.filter(Job.salary_range <= salary_max)
+            query = Job.query
 
-        # 페이지네이션 적용
-        pagination = query.paginate(page=page, per_page=size)
-        
-        return jsonify({
-            "status": "success",
-            "data": [job.to_dict() for job in pagination.items],
-            "pagination": {
-                "currentPage": page,
-                "totalPages": pagination.pages,
-                "totalItems": pagination.total
+            if keyword:
+                query = query.filter(Job.title.ilike(f'%{keyword}%'))
+            if category:
+                query = query.filter(Job.category == category)
+            if location:
+                query = query.filter(Job.location.ilike(f'%{location}%'))
+            if salary_min:
+                query = query.filter(Job.salary_range >= salary_min)
+            if salary_max:
+                query = query.filter(Job.salary_range <= salary_max)
+
+            pagination = query.paginate(page=page, per_page=size)
+            
+            return {
+                "status": "success",
+                "data": [job.to_dict() for job in pagination.items],
+                "pagination": {
+                    "currentPage": page,
+                    "totalPages": pagination.pages,
+                    "totalItems": pagination.total
+                }
             }
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 400
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
 
-@jobs_bp.route('/jobs', methods=['POST'])
-@jwt_required()
-def create_job():
-    """채용 공고 등록"""
-    try:
-        job_data = request.get_json()
-        
-        # 필수 필드 검증
-        required_fields = ['title', 'description', 'company', 'location']
-        for field in required_fields:
-            if field not in job_data:
-                return jsonify({
-                    "status": "error",
-                    "message": f"Missing required field: {field}"
-                }), 400
-
-        new_job = Job(
-            title=job_data['title'],
-            description=job_data['description'],
-            company=job_data['company'],
-            location=job_data['location'],
-            salary_range=job_data.get('salary_range'),
-            requirements=job_data.get('requirements', []),
-            category=job_data.get('category', '기타'),
-            job_type=job_data.get('job_type', '정규직')
-        )
-
-        db.session.add(new_job)
-        db.session.commit()
-
-        return jsonify({
-            "status": "success",
-            "data": new_job.to_dict()
-        }), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 400
-
-@jobs_bp.route('/jobs/<int:job_id>', methods=['GET'])
-def get_job(job_id):
-    """채용 공고 상세 조회"""
-    try:
-        job = Job.query.get_or_404(job_id)
-        return jsonify({
-            "status": "success",
-            "data": job.to_dict()
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 400
-
-@jobs_bp.route('/jobs/<int:job_id>', methods=['PUT'])
-@jwt_required()
-def update_job(job_id):
-    """채용 공고 수정"""
-    try:
-        job = Job.query.get_or_404(job_id)
-        job_data = request.get_json()
-
-        # 필드 업데이트
-        for key, value in job_data.items():
-            if hasattr(job, key):
-                setattr(job, key, value)
-
-        db.session.commit()
-
-        return jsonify({
-            "status": "success",
-            "data": job.to_dict()
-        }), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 400
-
-@jobs_bp.route('/jobs/<int:job_id>', methods=['DELETE'])
-@jwt_required()
-def delete_job(job_id):
-    """채용 공고 삭제"""
-    try:
-        job = Job.query.get_or_404(job_id)
-        db.session.delete(job)
-        db.session.commit()
-
-        return jsonify({
-            "status": "success",
-            "message": "Job deleted successfully"
-        }), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 400
-
-@jobs_bp.route('/jobs/search', methods=['GET'])
-def search_jobs():
-    """고급 검색 기능"""
-    try:
-        query = request.args.get('query')
-        page = request.args.get('page', 1, type=int)
-        size = request.args.get('size', 20, type=int)
-        
-        # 검색 쿼리 생성
-        search_query = Job.query
-
-        if query:
-            search_query = search_query.filter(
-                db.or_(
-                    Job.title.ilike(f'%{query}%'),
-                    Job.description.ilike(f'%{query}%'),
-                    Job.company.ilike(f'%{query}%')
-                )
+    @jobs_ns.doc('채용 공고 등록')
+    @jobs_ns.expect(job_model)
+    @jwt_required()
+    def post(self):
+        try:
+            job_data = request.get_json()
+            new_job = Job(
+                title=job_data['title'],
+                description=job_data['description'],
+                company=job_data['company'],
+                location=job_data['location'],
+                salary_range=job_data.get('salary_range'),
+                requirements=job_data.get('requirements', []),
+                category=job_data.get('category', '기타'),
+                job_type=job_data.get('job_type', '정규직')
             )
+            db.session.add(new_job)
+            db.session.commit()
+            return {"status": "success", "data": new_job.to_dict()}, 201
+        except Exception as e:
+            db.session.rollback()
+            return {"status": "error", "message": str(e)}, 400
 
-        # 페이지네이션 적용
-        pagination = search_query.paginate(page=page, per_page=size)
+@jobs_ns.route('/<int:job_id>')
+class Job(Resource):
+    @jobs_ns.doc('채용 공고 상세 조회')
+    def get(self, job_id):
+        try:
+            job = Job.query.get_or_404(job_id)
+            return {"status": "success", "data": job.to_dict()}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
 
-        return jsonify({
-            "status": "success",
-            "data": [job.to_dict() for job in pagination.items],
-            "pagination": {
-                "currentPage": page,
-                "totalPages": pagination.pages,
-                "totalItems": pagination.total
+    @jobs_ns.doc('채용 공고 수정')
+    @jobs_ns.expect(job_model)
+    @jwt_required()
+    def put(self, job_id):
+        try:
+            job = Job.query.get_or_404(job_id)
+            job_data = request.get_json()
+            for key, value in job_data.items():
+                if hasattr(job, key):
+                    setattr(job, key, value)
+            db.session.commit()
+            return {"status": "success", "data": job.to_dict()}
+        except Exception as e:
+            db.session.rollback()
+            return {"status": "error", "message": str(e)}, 400
+
+    @jobs_ns.doc('채용 공고 삭제')
+    @jwt_required()
+    def delete(self, job_id):
+        try:
+            job = Job.query.get_or_404(job_id)
+            db.session.delete(job)
+            db.session.commit()
+            return {"status": "success", "message": "Job deleted successfully"}
+        except Exception as e:
+            db.session.rollback()
+            return {"status": "error", "message": str(e)}, 400
+
+@jobs_ns.route('/search')
+class JobSearch(Resource):
+    @jobs_ns.doc('채용 공고 검색')
+    @jobs_ns.param('query', '검색어')
+    @jobs_ns.param('page', '페이지 번호', type=int, default=1)
+    @jobs_ns.param('size', '페이지 크기', type=int, default=20)
+    def get(self):
+        try:
+            query = request.args.get('query')
+            page = int(request.args.get('page', 1))
+            size = int(request.args.get('size', 20))
+            
+            search_query = Job.query
+            if query:
+                search_query = search_query.filter(
+                    db.or_(
+                        Job.title.ilike(f'%{query}%'),
+                        Job.description.ilike(f'%{query}%'),
+                        Job.company.ilike(f'%{query}%')
+                    )
+                )
+
+            pagination = search_query.paginate(page=page, per_page=size)
+            return {
+                "status": "success",
+                "data": [job.to_dict() for job in pagination.items],
+                "pagination": {
+                    "currentPage": page,
+                    "totalPages": pagination.pages,
+                    "totalItems": pagination.total
+                }
             }
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 400
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
