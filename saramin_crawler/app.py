@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
+from src.config.swagger import swagger_config, apispec
 from datetime import timedelta
 from src.crawler.job_crawler import SaraminCrawler
 from src.database.database import init_db, get_db
@@ -28,13 +29,13 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 jwt = JWTManager(app)
 
 # Swagger 설정
-SWAGGER_URL = '/api/docs'
-API_URL = 'http://113.198.66.75:19186/static/swagger.yaml'
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "OurJobs API Documentation"
+        'app_name': "OurJobs API"
     }
 )
 
@@ -102,6 +103,10 @@ def index():
             
     except Exception as e:
         return f"Crawling error: {str(e)}"
+    
+@app.route("/static/swagger.json")
+def create_swagger_spec():
+    return jsonify(apispec.to_dict())
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=19186)
