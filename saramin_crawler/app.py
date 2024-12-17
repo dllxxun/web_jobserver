@@ -21,17 +21,18 @@ jwt = JWTManager(app)
 api = Api(
     app,
     version='1.0',
-    title='Job Notice API',
+    title='Ours Job Management',
     description='swagger..',
     doc='/swagger/',
     prefix='/api',
     default='default',  # 기본 네임스페이스 설정
     default_label='Default Namespace',  # 기본 네임스페이스 라벨
-    contact='Contact Email',
-    contact_email='your@email.com',
+    contact='cyj0749@naver.com',
+    contact_email='cyj0749@naver.com',
     ui=True,  # Swagger UI 활성화
     validate=True  # 요청 유효성 검사 활성화
 )
+
 
 # Database initialization
 with app.app_context():
