@@ -9,10 +9,17 @@ from src.api.auth import auth_bp
 from src.api.jobs import jobs_bp
 from src.api.applications import applications_bp
 from src.api.bookmarks import bookmarks_bp
+from src.api.notification import notifications_bp
+from src.api.search import search_bp
+from src.api.statistics import statistics_bp
+from src.api.models import db
+
 
 
 app = Flask(__name__)
-app.config.from_object('config.Config')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 # JWT 설정
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
@@ -37,6 +44,9 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(jobs_bp, url_prefix='/api')
 app.register_blueprint(applications_bp, url_prefix='/api')
 app.register_blueprint(bookmarks_bp, url_prefix='/api')
+app.register_blueprint(search_bp)
+app.register_blueprint(statistics_bp)
+app.register_blueprint(notifications_bp)
 
 # Database initialization
 with app.app_context():
