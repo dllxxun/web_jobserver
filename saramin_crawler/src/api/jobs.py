@@ -1,34 +1,48 @@
-from flask import Blueprint, request, jsonify
-from src.database.models import JobPosting
-from src.database.database import get_db
+from fastapi import APIRouter, Query, Path, Depends
+from typing import Optional, List
+from datetime import datetime
+from .models import JobCreate, JobUpdate
 
-jobs_bp = Blueprint('jobs', __name__)
 
-@jobs_bp.route('/jobs', methods=['GET'])
-def get_jobs():
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    
-    db = next(get_db())
-    jobs = db.query(JobPosting).paginate(page=page, per_page=per_page)
-    
-    return jsonify({
-        'jobs': [{'id': job.id, 'title': job.title} for job in jobs.items],
-        'total': jobs.total,
-        'pages': jobs.pages
-    })
+router = APIRouter()
 
-@jobs_bp.route('/jobs/<int:job_id>', methods=['GET'])
-def get_job(job_id):
-    db = next(get_db())
-    job = db.query(JobPosting).get(job_id)
-    
-    if not job:
-        return jsonify({'error': 'Job not found'}), 404
-        
-    return jsonify({
-        'id': job.id,
-        'title': job.title,
-        'company': job.company.name,
-        'location': job.location
-    })
+@router.get("/jobs")
+async def get_jobs(
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=10, ge=1, le=100),
+    keyword: Optional[str] = None,
+    category: Optional[str] = None,
+    location: Optional[str] = None
+):
+    """채용 공고 목록 조회 (페이지네이션, 검색, 필터링)"""
+    pass
+
+@router.post("/jobs")
+async def create_job(job: JobCreate):
+    """채용 공고 등록"""
+    pass
+
+@router.get("/jobs/{job_id}")
+async def get_job(job_id: int = Path(...)):
+    """채용 공고 상세 조회"""
+    pass
+
+@router.put("/jobs/{job_id}")
+async def update_job(job_id: int, job: JobUpdate):
+    """채용 공고 수정"""
+    pass
+
+@router.delete("/jobs/{job_id}")
+async def delete_job(job_id: int):
+    """채용 공고 삭제"""
+    pass
+
+@router.get("/jobs/search")
+async def search_jobs(
+    query: str,
+    filters: Optional[dict] = None,
+    page: int = 1,
+    size: int = 10
+):
+    """고급 검색 기능"""
+    pass
