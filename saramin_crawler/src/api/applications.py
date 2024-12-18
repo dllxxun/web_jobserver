@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource, Namespace, fields
 from src.database.models import Application
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.database.database import get_db
 
 applications_ns = Namespace('applications', description='지원 관리 API')
