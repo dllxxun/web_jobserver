@@ -1,7 +1,13 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
+from flask import Flask
+from src.api.models import db
 
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///job_database.db'
+db.init_app(app)
+            
 Base = declarative_base()
 
 class Company(Base):

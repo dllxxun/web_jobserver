@@ -65,6 +65,8 @@ class Job(db.Model):
         db.Index('idx_job_composite', 'title', 'company_id', 'category_id')
     )
 
+    category = db.relationship('JobCategory', back_populates='jobs')
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -80,6 +82,7 @@ class Job(db.Model):
             'updated_at': self.updated_at
         }
     
+    
 class JobCategory(db.Model):
     __tablename__ = 'job_categories'
     
@@ -90,12 +93,13 @@ class JobCategory(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # 관계 설정
-    jobs = db.relationship('Job', back_populates='category', lazy=True)
+    jobs = db.relationship('Job', back_populates='category')
 
     # 인덱스 설정
     __table_args__ = (
         db.Index('idx_category_name', 'name'),
     )
+
 
 # 회사 정보 테이블
 class Company(db.Model):

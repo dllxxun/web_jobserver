@@ -7,6 +7,7 @@ from src.database.database import init_db, get_db
 from src.database.models import JobPosting, Company
 from src.api.models import db
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 CORS(app, resources={
@@ -20,6 +21,7 @@ CORS(app, resources={
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+
 
 # JWT 설정
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
@@ -136,4 +138,4 @@ api.add_namespace(applications_ns, path='/applications')
 api.add_namespace(bookmarks_ns, path='/bookmarks')
 
 if __name__ == '__main__':
-    app.run(host='113.198.66.75', port=13186, debug=True,  threaded=True)
+    app.run(host='113.198.66.75', port=19186, debug=True)
