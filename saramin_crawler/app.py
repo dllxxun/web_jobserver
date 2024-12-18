@@ -9,7 +9,14 @@ from src.api.models import db
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+        "supports_credentials": True
+    }
+})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -88,6 +95,25 @@ def index():
         return f"Crawling error: {str(e)}"
 
 # API 모델 정의
+auth_model = api.model('Auth', {
+    'email': fields.String(required=True, description='사용자 이메일'),
+    'password': fields.String(required=True, description='비밀번호')
+})
+
+job_model = api.model('Job', {
+    'title': fields.String(required=True, description='채용 공고 제목'),
+    'company': fields.String(required=True, description='회사명'),
+    'location': fields.String(required=True, description='근무지'),
+    'salary_range': fields.String(description='급여 범위'),
+    'category': fields.String(description='카테고리')
+})
+
+# Swagger JSON 엔드포인트 추가
+@app.route('/apispec.json')
+def get_apispec():
+    return jsonify(api.__schema__)
+
+# API 모델 정의
 job_model = api.model('Job', {
     'title': fields.String(required=True, description='채용 공고 제목'),
     'company': fields.String(required=True, description='회사명'),
@@ -114,4 +140,4 @@ api.add_namespace(statistics_ns)
 api.add_namespace(notifications_ns)
 
 if __name__ == '__main__':
-    app.run(host='113.198.66.75', port=19186, debug=True)
+    app.run(host='0.0.0.0', port=19186, debug=True)

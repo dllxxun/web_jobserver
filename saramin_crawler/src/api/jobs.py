@@ -19,14 +19,19 @@ job_model = jobs_ns.model('Job', {
 
 @jobs_ns.route('/')
 class JobList(Resource):
-    @jobs_ns.doc('채용 공고 목록 조회')
-    @jobs_ns.param('page', '페이지 번호', type=int, default=1)
-    @jobs_ns.param('size', '페이지 크기', type=int, default=20)
-    @jobs_ns.param('keyword', '검색어')
-    @jobs_ns.param('category', '카테고리')
-    @jobs_ns.param('location', '지역')
-    @jobs_ns.param('salary_min', '최소 급여', type=int)
-    @jobs_ns.param('salary_max', '최대 급여', type=int)
+    @jobs_ns.doc('채용 공고 목록 조회',
+        params={
+            'page': {'description': '페이지 번호', 'type': 'integer', 'default': 1},
+            'size': {'description': '페이지 크기', 'type': 'integer', 'default': 10},
+            'keyword': {'description': '검색어', 'type': 'string'},
+            'category': {'description': '카테고리', 'type': 'string'},
+            'location': {'description': '지역', 'type': 'string'},
+            'salary_min': {'description': '최소 급여', 'type': 'int'},
+            'salary_max': {'description': '최대 급여', 'type': 'int'}
+        })
+    def get(self):
+        """채용 공고 목록을 조회합니다."""
+        pass
     def get(self):
         try:
             page = int(request.args.get('page', 1))
@@ -66,6 +71,10 @@ class JobList(Resource):
 
     @jobs_ns.doc('채용 공고 등록')
     @jobs_ns.expect(job_model)
+    @jobs_ns.response(201, '생성 성공')
+    def post(self):
+        """새로운 채용 공고를 등록합니다."""
+        pass
     @jwt_required()
     def post(self):
         try:

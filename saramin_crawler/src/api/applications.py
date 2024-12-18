@@ -5,6 +5,7 @@ from src.database.database import get_db
 
 applications_ns = Namespace('applications', path='/applications')
 
+
 @applications_ns.route('/apply/<int:job_id>')
 class ApplyJob(Resource):
     @applications_ns.doc('지원하기')
