@@ -55,7 +55,8 @@ class Job(db.Model):
     tech_stacks = db.relationship('TechStack', secondary=job_tech_stacks, backref='jobs', lazy='dynamic')
     applications = db.relationship('Application', backref='job', lazy=True, cascade='all, delete-orphan')
     bookmarks = db.relationship('Bookmark', backref='job', lazy=True, cascade='all, delete-orphan')
-                                
+    category = db.relationship('JobCategory', back_populates='jobs')
+    
     # 인덱스 설정
     __table_args__ = (
         db.Index('idx_job_title', 'title'),
@@ -89,7 +90,7 @@ class JobCategory(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # 관계 설정
-    jobs = db.relationship('Job', backref='category', lazy=True)
+    jobs = db.relationship('Job', back_populates='category', lazy=True)
 
     # 인덱스 설정
     __table_args__ = (
