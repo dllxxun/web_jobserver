@@ -32,7 +32,40 @@ class Job(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
+
+# 회사 정보 테이블
+class Company(db.Model):
+    __tablename__ = 'companies'
     
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    location = db.Column(db.String(100))
+    industry = db.Column(db.String(50))
+    employee_count = db.Column(db.Integer)
+    founded_year = db.Column(db.Integer)
+    website = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    # 관계 설정
+    jobs = db.relationship('Job', backref='company', lazy=True)
+
+# 기술 스택 테이블
+class TechStack(db.Model):
+    __tablename__ = 'tech_stacks'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    category = db.Column(db.String(50))
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# 직무-기술 스택 연결 테이블
+job_tech_stacks = db.Table('job_tech_stacks',
+    db.Column('job_id', db.Integer, db.ForeignKey('jobs.id'), primary_key=True),
+    db.Column('tech_stack_id', db.Integer, db.ForeignKey('tech_stacks.id'), primary_key=True)
+)
+
 class Bookmark(db.Model):
     __tablename__ = 'bookmarks'
 
@@ -50,6 +83,33 @@ class Bookmark(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
     }
+
+# 이력서 테이블
+class Resume(db.Model):
+    __tablename__ = 'resumes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text)
+    education = db.Column(db.Text)
+    experience = db.Column(db.Text)
+    skills = db.Column(db.Text)
+    file_path = db.Column(db.String(500))
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+# 알림 설정 테이블
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # 'application_status', 'new_job', etc.
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class NotificationSetting(db.Model):
     __tablename__ = 'notification_settings'

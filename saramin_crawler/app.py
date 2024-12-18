@@ -46,6 +46,7 @@ api = Api(
 # Database initialization
 with app.app_context():
     init_db()
+    db.create_all()
 
 @app.route('/')
 def index():
