@@ -23,6 +23,7 @@ db.init_app(app)
 
 # JWT 설정
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 jwt = JWTManager(app)
 
 # Swagger UI 설정
