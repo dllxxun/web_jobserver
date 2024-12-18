@@ -6,8 +6,10 @@ from src.crawler.job_crawler import SaraminCrawler
 from src.database.database import init_db, get_db
 from src.database.models import JobPosting, Company
 from src.api.models import db
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -112,4 +114,4 @@ api.add_namespace(statistics_ns)
 api.add_namespace(notifications_ns)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=19186, debug=True)
+    app.run(host='113.198.66.75', port=19186, debug=True)
