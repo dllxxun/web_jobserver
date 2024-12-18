@@ -14,7 +14,6 @@ db.init_app(app)
 
 # JWT 설정
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'
-
 jwt = JWTManager(app)
 
 # Swagger UI 설정
@@ -104,13 +103,13 @@ from src.api.statistics import statistics_ns
 from src.api.notification import notifications_ns
 
 # API 그룹화
-api.add_namespace(auth_ns, path='/auth')
-api.add_namespace(jobs_ns, path='/jobs')
-api.add_namespace(applications_ns, path='/applications')
-api.add_namespace(bookmarks_ns, path='/bookmarks')
-api.add_namespace(search_ns, path='/search')
-api.add_namespace(statistics_ns, path='/statistics')
-api.add_namespace(notifications_ns, path='/notifications')
+api.add_namespace(auth_ns)
+api.add_namespace(jobs_ns)
+api.add_namespace(applications_ns)
+api.add_namespace(bookmarks_ns)
+api.add_namespace(search_ns)
+api.add_namespace(statistics_ns)
+api.add_namespace(notifications_ns)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=19186, debug=True)
