@@ -136,4 +136,4 @@ api.add_namespace(applications_ns, path='/applications')
 api.add_namespace(bookmarks_ns, path='/bookmarks')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=19186, debug=True)
+    app.run(host='113.198.66.75', port=13186, debug=True,  threaded=True)
