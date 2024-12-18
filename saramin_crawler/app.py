@@ -33,7 +33,7 @@ api = Api(
     title='Ours Job Management',
     description='swagger..',
     doc='/swagger/',
-    prefix='/api',
+    prefix='/113.198.66.75:19186/',
     default='default',  # 기본 네임스페이스 설정
     default_label='Default Namespace',  # 기본 네임스페이스 라벨
     contact='cyj0749@naver.com',
@@ -127,18 +127,12 @@ from src.api.auth import auth_ns
 from src.api.jobs import jobs_ns
 from src.api.applications import applications_ns
 from src.api.bookmarks import bookmarks_ns
-from src.api.search import search_ns
-from src.api.statistics import statistics_ns
-from src.api.notification import notifications_ns
 
 # API 그룹화
 api.add_namespace(auth_ns)
 api.add_namespace(jobs_ns)
 api.add_namespace(applications_ns)
 api.add_namespace(bookmarks_ns)
-api.add_namespace(search_ns)
-api.add_namespace(statistics_ns)
-api.add_namespace(notifications_ns)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=19186, debug=True)
